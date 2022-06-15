@@ -33,6 +33,42 @@ def api_all():
 def page_not_found(e):
     return "<h1>404</h1><p>The resource could not be found.</p>", 404
 
+#how to make it input based?
+@app.route('/api/v1/resources/books', methods=['GET'])
+def api_test():
+    query = "SELECT * FROM books WHERE"
+    to_filter = []
+
+    query_parameters = request.args
+
+    #id = query_parameters.get(int(input('Enter an id:')))
+   # published = query_parameters.get('published')
+    author = query_parameters.get(input('Who is the author:'))
+
+    query = "SELECT * FROM books WHERE"
+    to_filter = []
+
+    # if id:
+    #     query += ' id=? AND'
+    #     to_filter.append(id)
+    # if published:
+    #     query += ' published=? AND'
+    #     to_filter.append(published)
+    if author:
+        query += ' author=? AND'
+        to_filter.append(author)
+    if not (id or published or author):
+        return page_not_found(404)
+
+    query = query[:-4] + ';'
+
+    conn = sqlite3.connect('books.db')
+    conn.row_factory = dict_factory
+    cur = conn.cursor()
+
+    results = cur.execute(query, to_filter).fetchall()
+
+    return jsonify(results)
 
 @app.route('/api/v1/resources/books', methods=['GET'])
 def api_filter():
